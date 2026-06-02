@@ -1,0 +1,168 @@
+import { TopBar } from "@/components/layout/topbar";
+import { KpiCard } from "@/components/ui/kpi-card";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { CostDonut } from "@/components/charts/cost-donut";
+import {
+  trips,
+  costRecords,
+  getCompletedTrips,
+  getTotalDriverCost,
+  getTotalFuelCost,
+  getTotalTollCost,
+  getMonthlyFixedCost,
+} from "@/lib/mock-data";
+import { formatBaht, formatThaiDateShort } from "@/lib/utils";
+import { AlertTriangle } from "lucide-react";
+
+const completed = getCompletedTrips();
+const driverCost = getTotalDriverCost();
+const fuelCost = getTotalFuelCost();
+const tollCost = getTotalTollCost();
+const FIXED_PER_TRIP = 135;
+const fixedCostAllocated = completed.length * FIXED_PER_TRIP; // allocated fixed cost for completed trips
+const maintenanceCost = costRecords.filter((c) => c.cost_category === "Maintenance").reduce((s, c) => s + c.cost_amount, 0);
+const totalCost = driverCost + fuelCost + tollCost + fixedCostAllocated;
+const n = completed.length || 1;
+
+const donutData = [
+  { name: "ค่าคนขับ", value: driverCost },
+  { name: "ค่าน้ำมัน", value: fuelCost },
+  { name: "ค่าทางด่วน", value: tollCost },
+  { name: "ต้นทุนคงที่", value: fixedCostAllocated },
+];
+
+const abnormal = completed.filter((t) => t.fuel_cost > 120);
+
+export default function CostsPage() {
+  return (
+    <>
+      <TopBar title="ต้นทุน" subtitle="มิถุนายน 2569" />
+      <div className="p-6 space-y-5">
+
+        {/* KPIs */}
+        <div className="grid grid-cols-4 gap-4">
+          <KpiCard label="ต้นทุนรวม" value={formatBaht(totalCost)} change={8.1} changeLabel="vs เดือนก่อน" />
+          <KpiCard label="ต้นทุนเฉลี่ย/รอบ" value={formatBaht(Math.round(totalCost / n))} />
+          <KpiCard label="ค่าน้ำมัน/รอบ" value={formatBaht(Math.round(fuelCost / n))} />
+          <KpiCard label="ค่าทางด่วน/รอบ" value={formatBaht(Math.round(tollCost / n))} />
+        </div>
+
+        {/* Charts + Breakdown */}
+        <div className="grid grid-cols-3 gap-4">
+          <Card>
+            <CardHeader><CardTitle>สัดส่วนต้นทุน</CardTitle></CardHeader>
+            <CostDonut data={donutData} />
+          </Card>
+
+          <Card className="col-span-2">
+            <CardHeader><CardTitle>รายละเอียดต้นทุน</CardTitle></CardHeader>
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-[#E5E7EB]">
+                  {["ประเภทต้นทุน", "ชนิด", "รวมเดือนนี้", "เฉลี่ย/รอบ", "% ของต้นทุนรวม"].map((h) => (
+                    <th key={h} className="py-2 px-3 text-xs font-semibold text-[#6B7280] text-left">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  { name: "ค่าคนขับ",   type: "Variable", amount: driverCost, color: "" },
+                  { name: "ค่าน้ำมัน",  type: "Variable", amount: fuelCost,   color: "" },
+                  { name: "ค่าทางด่วน", type: "Variable", amount: tollCost,   color: "" },
+                  { name: `ต้นทุนคงที่ (${FIXED_PER_TRIP} ฿/รอบ × ${completed.length} รอบ)`, type: "Fixed", amount: fixedCostAllocated, color: "text-[#6B7280]" },
+                ].map((row) => (
+                  <tr key={row.name} className="border-b border-[#F3F4F6] hover:bg-[#F8FAFC]">
+                    <td className="py-2.5 px-3 font-medium">{row.name}</td>
+                    <td className="py-2.5 px-3">
+                      <span className={`text-xs px-1.5 py-0.5 rounded ${row.type === "Fixed" ? "bg-purple-50 text-purple-700" : "bg-blue-50 text-blue-700"}`}>
+                        {row.type}
+                      </span>
+                    </td>
+                    <td className="py-2.5 px-3">{row.amount.toLocaleString("th-TH")} ฿</td>
+                    <td className="py-2.5 px-3">{Math.round(row.amount / n).toLocaleString("th-TH")} ฿</td>
+                    <td className="py-2.5 px-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-20 bg-[#F3F4F6] rounded-full h-1.5">
+                          <div className="bg-[#2563EB] h-1.5 rounded-full" style={{ width: `${(row.amount / totalCost) * 100}%` }} />
+                        </div>
+                        <span className="text-xs text-[#6B7280]">{((row.amount / totalCost) * 100).toFixed(1)}%</span>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+                <tr className="bg-[#F9FAFB] font-semibold">
+                  <td className="py-2.5 px-3">รวมทั้งหมด</td>
+                  <td className="py-2.5 px-3"></td>
+                  <td className="py-2.5 px-3">{totalCost.toLocaleString("th-TH")} ฿</td>
+                  <td className="py-2.5 px-3">{Math.round(totalCost / n).toLocaleString("th-TH")} ฿</td>
+                  <td className="py-2.5 px-3 text-xs text-[#6B7280]">100%</td>
+                </tr>
+              </tbody>
+            </table>
+          </Card>
+        </div>
+
+        {/* Abnormal Cost Alert */}
+        {abnormal.length > 0 && (
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <AlertTriangle size={14} className="text-yellow-600" />
+                <CardTitle>ต้นทุนผิดปกติ — ค่าน้ำมัน/รอบ &gt; 120 บาท</CardTitle>
+              </div>
+            </CardHeader>
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-[#E5E7EB]">
+                  {["Job ID", "วันที่", "คนขับ", "ค่าน้ำมัน", "หมายเหตุ"].map((h) => (
+                    <th key={h} className="py-2 px-3 text-xs font-semibold text-[#6B7280] text-left">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {abnormal.map((t) => (
+                  <tr key={t.trip_id} className="border-b border-[#F3F4F6] bg-yellow-50/50">
+                    <td className="py-2 px-3 text-xs font-mono text-[#9CA3AF]">{t.trip_id}</td>
+                    <td className="py-2 px-3 text-xs">{formatThaiDateShort(t.job_date)}</td>
+                    <td className="py-2 px-3 text-sm">{t.assigned_driver_name}</td>
+                    <td className="py-2 px-3 text-sm font-medium text-yellow-700">{t.fuel_cost} ฿</td>
+                    <td className="py-2 px-3 text-xs text-[#6B7280]">{t.remark || "—"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </Card>
+        )}
+
+        {/* Cost Records */}
+        <Card className="p-0 overflow-hidden">
+          <div className="px-4 py-3 border-b border-[#E5E7EB]">
+            <CardTitle>รายการต้นทุนเพิ่มเติม</CardTitle>
+          </div>
+          <table className="w-full text-sm">
+            <thead className="bg-[#F9FAFB]">
+              <tr>
+                {["Cost ID", "วันที่", "ประเภท", "จำนวน", "หมายเหตุ"].map((h) => (
+                  <th key={h} className="py-2.5 px-3 text-xs font-semibold text-[#6B7280] text-left border-b border-[#E5E7EB]">{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {costRecords.map((c) => (
+                <tr key={c.cost_id} className="border-b border-[#F3F4F6] hover:bg-[#F8FAFC]">
+                  <td className="py-2.5 px-3 text-xs font-mono text-[#9CA3AF]">{c.cost_id}</td>
+                  <td className="py-2.5 px-3 text-xs">{formatThaiDateShort(c.cost_date)}</td>
+                  <td className="py-2.5 px-3">
+                    <span className="text-xs px-1.5 py-0.5 rounded bg-gray-100 text-gray-700">{c.cost_category}</span>
+                  </td>
+                  <td className="py-2.5 px-3 font-medium">{c.cost_amount.toLocaleString("th-TH")} ฿</td>
+                  <td className="py-2.5 px-3 text-xs text-[#6B7280]">{c.remark}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </Card>
+      </div>
+    </>
+  );
+}
