@@ -30,8 +30,8 @@ export default function SettingsPage() {
             </thead>
             <tbody>
               {settings.map((s) => (
-                <tr key={s.name} className="border-b border-[#F3F4F6] hover:bg-[#F8FAFC]">
-                  <td className="py-2.5 px-3 text-xs font-mono text-[#2563EB]">{s.name}</td>
+                <tr key={s.name} className="border-b border-[#F3F4F6] hover:bg-[#F4F6F5]">
+                  <td className="py-2.5 px-3 text-xs font-mono text-[#1B4332]">{s.name}</td>
                   <td className="py-2.5 px-3 font-semibold">{Number(s.value).toLocaleString("th-TH")}</td>
                   <td className="py-2.5 px-3 text-xs text-[#6B7280]">{s.description}</td>
                 </tr>

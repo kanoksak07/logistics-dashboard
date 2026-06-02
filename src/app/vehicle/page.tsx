@@ -80,11 +80,11 @@ export default function VehiclePage() {
             <div className="flex items-center gap-3">
               <div className="flex-1 bg-[#F3F4F6] rounded-full h-3">
                 <div
-                  className="bg-[#2563EB] h-3 rounded-full transition-all"
+                  className="bg-[#1B4332] h-3 rounded-full transition-all"
                   style={{ width: `${recoveryPct}%` }}
                 />
               </div>
-              <span className="text-xs font-bold text-[#2563EB] w-12 text-right">{recoveryPct.toFixed(1)}%</span>
+              <span className="text-xs font-bold text-[#1B4332] w-12 text-right">{recoveryPct.toFixed(1)}%</span>
             </div>
             <div className="flex justify-between text-xs text-[#6B7280]">
               <span>ซื้อมา {monthsOwned} เดือน</span>
@@ -110,7 +110,7 @@ export default function VehiclePage() {
                     <td className="py-2 text-right font-medium">{row.amount.toLocaleString("th-TH")} ฿</td>
                   </tr>
                 ))}
-                <tr className="font-semibold bg-[#F9FAFB]">
+                <tr className="font-semibold bg-[#FAFAFA]">
                   <td className="py-2.5">รวมต้นทุนคงที่</td>
                   <td className="py-2.5 text-right">{monthlyFixed.toLocaleString("th-TH")} ฿</td>
                 </tr>
@@ -140,7 +140,7 @@ export default function VehiclePage() {
               <hr className="border-[#E5E7EB]" />
               <div className="flex justify-between text-base font-bold">
                 <span>Break-even</span>
-                <span className="text-[#2563EB]">{breakEvenTrips} รอบ/เดือน</span>
+                <span className="text-[#1B4332]">{breakEvenTrips} รอบ/เดือน</span>
               </div>
               <div className="p-2.5 rounded-md border mt-2 text-xs" style={{ borderColor: completed.length >= breakEvenTrips ? "#BBF7D0" : "#FDE68A", backgroundColor: completed.length >= breakEvenTrips ? "#F0FDF4" : "#FFFBEB" }}>
                 {completed.length >= breakEvenTrips
@@ -157,7 +157,7 @@ export default function VehiclePage() {
             <CardTitle>ประวัติการซ่อมบำรุง</CardTitle>
           </div>
           <table className="w-full text-sm">
-            <thead className="bg-[#F9FAFB]">
+            <thead className="bg-[#FAFAFA]">
               <tr>
                 {["วันที่", "รายการ", "ค่าใช้จ่าย"].map((h) => (
                   <th key={h} className="py-2.5 px-4 text-xs font-semibold text-[#6B7280] text-left border-b border-[#E5E7EB]">{h}</th>
@@ -166,7 +166,7 @@ export default function VehiclePage() {
             </thead>
             <tbody>
               {maintenanceRecords.map((c) => (
-                <tr key={c.cost_id} className="border-b border-[#F3F4F6] hover:bg-[#F8FAFC]">
+                <tr key={c.cost_id} className="border-b border-[#F3F4F6] hover:bg-[#F4F6F5]">
                   <td className="py-2.5 px-4 text-xs">{formatThaiDateShort(c.cost_date)}</td>
                   <td className="py-2.5 px-4">{c.remark}</td>
                   <td className="py-2.5 px-4 font-medium">{c.cost_amount.toLocaleString("th-TH")} ฿</td>

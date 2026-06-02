@@ -1,10 +1,14 @@
+"use client";
+
 import { TopBar } from "@/components/layout/topbar";
 import { KpiCard } from "@/components/ui/kpi-card";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge } from "@/components/ui/badge";
-import { TrendChart } from "@/components/charts/trend-chart";
-import { CostDonut } from "@/components/charts/cost-donut";
-import { TripBar } from "@/components/charts/trip-bar";
+import dynamic from "next/dynamic";
+
+const TrendChart = dynamic(() => import("@/components/charts/trend-chart").then(m => ({ default: m.TrendChart })), { ssr: false });
+const CostDonut  = dynamic(() => import("@/components/charts/cost-donut").then(m => ({ default: m.CostDonut })),   { ssr: false });
+const TripBar    = dynamic(() => import("@/components/charts/trip-bar").then(m => ({ default: m.TripBar })),       { ssr: false });
 import {
   trips,
   monthlyTrend,
@@ -94,10 +98,10 @@ const insights = [
 ];
 
 const insightIcons = {
-  success: <CheckCircle size={13} className="text-green-600 shrink-0 mt-0.5" />,
-  warning: <AlertTriangle size={13} className="text-yellow-600 shrink-0 mt-0.5" />,
-  error: <AlertTriangle size={13} className="text-red-600 shrink-0 mt-0.5" />,
-  info: <Info size={13} className="text-blue-500 shrink-0 mt-0.5" />,
+  success: <CheckCircle size={13} className="text-[#2D6A4F] shrink-0 mt-0.5" />,
+  warning: <AlertTriangle size={13} className="text-amber-500 shrink-0 mt-0.5" />,
+  error:   <AlertTriangle size={13} className="text-red-500 shrink-0 mt-0.5" />,
+  info:    <Info size={13} className="text-[#40916C] shrink-0 mt-0.5" />,
 };
 
 export default function OverviewPage() {
@@ -112,11 +116,11 @@ export default function OverviewPage() {
       <TopBar title="ภาพรวมธุรกิจ" subtitle="มิถุนายน 2569" />
       <div className="p-6 space-y-5">
 
-        {/* KPI Row 1 */}
+        {/* KPI Row 1 — first card is featured (dark green) */}
         <div className="grid grid-cols-4 gap-4">
-          <KpiCard label="รายได้รวม" value={formatBaht(totalRevenue)} change={12.4} changeLabel="vs เดือนก่อน" icon={<DollarSign size={14} />} />
+          <KpiCard featured label="รายได้รวม" value={formatBaht(totalRevenue)} change={12.4} changeLabel="vs เดือนก่อน" icon={<DollarSign size={14} />} />
           <KpiCard label="ต้นทุนรวม" value={formatBaht(totalCost)} change={8.1} changeLabel="vs เดือนก่อน" icon={<DollarSign size={14} />} />
-          <KpiCard label="กำไรสุทธิ" value={formatBaht(netProfit)} change={profitChange} changeLabel="vs เดือนก่อน" icon={<TrendingUp size={14} />} valueColor={netProfit >= 0 ? "text-green-700" : "text-red-700"} />
+          <KpiCard label="กำไรสุทธิ" value={formatBaht(netProfit)} change={profitChange} changeLabel="vs เดือนก่อน" icon={<TrendingUp size={14} />} valueColor={netProfit >= 0 ? "text-[#1B4332]" : "text-red-600"} />
           <KpiCard label="Profit Margin" value={formatPercent(profitMargin)} change={1.5} changeLabel="vs เดือนก่อน" icon={<Percent size={14} />} />
         </div>
 
@@ -130,7 +134,7 @@ export default function OverviewPage() {
           />
           <KpiCard label="รายได้เฉลี่ย/รอบ" value={formatBaht(Math.round(avgRevPerTrip))} icon={<DollarSign size={14} />} />
           <KpiCard label="ต้นทุนเฉลี่ย/รอบ" value={formatBaht(Math.round(avgCostPerTrip))} icon={<DollarSign size={14} />} />
-          <KpiCard label="กำไรเฉลี่ย/รอบ" value={formatBaht(Math.round(avgProfitPerTrip))} valueColor={avgProfitPerTrip >= 150 ? "text-green-700" : "text-red-700"} icon={<TrendingUp size={14} />} />
+          <KpiCard label="กำไรเฉลี่ย/รอบ" value={formatBaht(Math.round(avgProfitPerTrip))} valueColor={avgProfitPerTrip >= 150 ? "text-[#1B4332]" : "text-red-600"} icon={<TrendingUp size={14} />} />
         </div>
 
         {/* Charts */}
@@ -161,7 +165,7 @@ export default function OverviewPage() {
               </div>
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="bg-[#F9FAFB]">
+                  <tr className="bg-[#FAFAFA]">
                     {["Job ID", "วันที่", "ลูกค้า", "คนขับ", "รายได้", "กำไร", "สถานะ"].map((h) => (
                       <th key={h} className={`py-2 px-3 text-xs font-semibold text-[#6B7280] ${["รายได้","กำไร"].includes(h) ? "text-right" : "text-left"}`}>{h}</th>
                     ))}
@@ -169,7 +173,7 @@ export default function OverviewPage() {
                 </thead>
                 <tbody>
                   {recentTrips.map((t) => (
-                    <tr key={t.trip_id} className="border-t border-[#F3F4F6] hover:bg-[#F8FAFC] transition-colors">
+                    <tr key={t.trip_id} className="border-t border-[#F3F4F6] hover:bg-[#F4F6F5] transition-colors">
                       <td className="py-2 px-3 text-xs font-mono text-[#9CA3AF]">{t.trip_id}</td>
                       <td className="py-2 px-3 text-xs text-[#374151]">{formatThaiDateShort(t.job_date)}</td>
                       <td className="py-2 px-3 text-sm">{t.customer_name}</td>
@@ -204,9 +208,9 @@ export default function OverviewPage() {
                   <span>ความคืบหน้า Break-even</span>
                   <span>{completed.length} / {breakEvenTrips} รอบ</span>
                 </div>
-                <div className="w-full bg-[#F3F4F6] rounded-full h-1.5">
+                <div className="w-full bg-[#E5E7EB] rounded-full h-2">
                   <div
-                    className="bg-[#2563EB] h-1.5 rounded-full"
+                    className="bg-[#1B4332] h-2 rounded-full"
                     style={{ width: `${Math.min((completed.length / breakEvenTrips) * 100, 100)}%` }}
                   />
                 </div>

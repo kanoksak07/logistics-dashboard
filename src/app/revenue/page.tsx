@@ -1,8 +1,11 @@
+"use client";
+
 import { TopBar } from "@/components/layout/topbar";
 import { KpiCard } from "@/components/ui/kpi-card";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge } from "@/components/ui/badge";
-import { TrendChart } from "@/components/charts/trend-chart";
+import dynamic from "next/dynamic";
+const TrendChart = dynamic(() => import("@/components/charts/trend-chart").then(m => ({ default: m.TrendChart })), { ssr: false });
 import {
   trips,
   monthlyTrend,
@@ -69,7 +72,7 @@ export default function RevenuePage() {
             <CardTitle>เปรียบเทียบรายเดือน</CardTitle>
           </div>
           <table className="w-full text-sm">
-            <thead className="bg-[#F9FAFB]">
+            <thead className="bg-[#FAFAFA]">
               <tr>
                 {["เดือน", "รายได้", "ต้นทุน", "กำไร", "จำนวนรอบ", "กำไร/รอบ"].map((h) => (
                   <th key={h} className="py-2.5 px-3 text-xs font-semibold text-[#6B7280] text-left border-b border-[#E5E7EB]">{h}</th>
@@ -78,8 +81,8 @@ export default function RevenuePage() {
             </thead>
             <tbody>
               {trendData.filter((m) => m.revenue > 0).map((m) => (
-                <tr key={m.month} className={`border-b border-[#F3F4F6] hover:bg-[#F8FAFC] ${m.month === "มิ.ย." ? "bg-blue-50/50" : ""}`}>
-                  <td className="py-2.5 px-3 font-medium">{m.month}{m.month === "มิ.ย." && <span className="ml-1 text-xs text-[#2563EB]">(ปัจจุบัน)</span>}</td>
+                <tr key={m.month} className={`border-b border-[#F3F4F6] hover:bg-[#F4F6F5] ${m.month === "มิ.ย." ? "bg-blue-50/50" : ""}`}>
+                  <td className="py-2.5 px-3 font-medium">{m.month}{m.month === "มิ.ย." && <span className="ml-1 text-xs text-[#1B4332]">(ปัจจุบัน)</span>}</td>
                   <td className="py-2.5 px-3">{m.revenue.toLocaleString("th-TH")} ฿</td>
                   <td className="py-2.5 px-3">{m.cost.toLocaleString("th-TH")} ฿</td>
                   <td className={`py-2.5 px-3 font-medium ${m.profit >= 0 ? "text-green-700" : "text-red-600"}`}>
@@ -110,7 +113,7 @@ export default function RevenuePage() {
                   </div>
                   <div className="w-full bg-[#F3F4F6] rounded-full h-1.5">
                     <div
-                      className="bg-[#2563EB] h-1.5 rounded-full"
+                      className="bg-[#1B4332] h-1.5 rounded-full"
                       style={{ width: `${(d.profit / Math.max(...driverStats.map(ds => ds.profit))) * 100}%` }}
                     />
                   </div>
@@ -128,7 +131,7 @@ export default function RevenuePage() {
               <div className="py-8 text-center text-sm text-[#6B7280]">ไม่มีรอบที่ขาดทุน 🎉</div>
             ) : (
               <table className="w-full text-sm">
-                <thead className="bg-[#F9FAFB]">
+                <thead className="bg-[#FAFAFA]">
                   <tr>
                     {["Job ID", "วันที่", "คนขับ", "รายได้", "ต้นทุน", "ขาดทุน"].map((h) => (
                       <th key={h} className="py-2 px-3 text-xs font-semibold text-[#6B7280] text-left border-b border-[#E5E7EB]">{h}</th>

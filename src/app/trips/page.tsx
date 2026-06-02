@@ -53,7 +53,7 @@ export default function TripsPage() {
                 placeholder="ค้นหา Job ID, ลูกค้า, เบอร์, คนขับ"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-8 pr-3 py-1.5 text-sm border border-[#E5E7EB] rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-[#2563EB]"
+                className="w-full pl-8 pr-3 py-1.5 text-sm border border-[#E5E7EB] rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-[#1B4332]"
               />
             </div>
             <div className="flex gap-1.5">
@@ -61,10 +61,10 @@ export default function TripsPage() {
                 <button
                   key={s.value}
                   onClick={() => setStatusFilter(s.value)}
-                  className={`px-2.5 py-1 text-xs rounded-md border transition-colors ${
+                  className={`px-2.5 py-1 text-xs rounded-full border transition-colors ${
                     statusFilter === s.value
-                      ? "bg-[#2563EB] text-white border-[#2563EB]"
-                      : "bg-white text-[#374151] border-[#E5E7EB] hover:bg-[#F8FAFC]"
+                      ? "bg-[#1B4332] text-white border-[#1B4332]"
+                      : "bg-white text-[#4B5563] border-[#E5E7EB] hover:bg-[#F4F6F5]"
                   }`}
                 >
                   {s.label}
@@ -77,7 +77,7 @@ export default function TripsPage() {
           {/* Table */}
           <Card className="p-0 overflow-hidden flex-1 overflow-y-auto">
             <table className="w-full text-sm">
-              <thead className="sticky top-0 bg-[#F9FAFB] z-10">
+              <thead className="sticky top-0 bg-[#FAFAFA] z-10">
                 <tr>
                   {["Job ID", "วันที่", "ลูกค้า", "คนขับ", "โกดัง", "รายได้", "กำไร", "สถานะ", ""].map((h) => (
                     <th key={h} className={`py-2.5 px-3 text-xs font-semibold text-[#6B7280] border-b border-[#E5E7EB] ${["รายได้","กำไร"].includes(h) ? "text-right" : "text-left"}`}>
@@ -91,7 +91,7 @@ export default function TripsPage() {
                   <tr
                     key={t.trip_id}
                     onClick={() => setSelected(t)}
-                    className={`border-b border-[#F3F4F6] hover:bg-[#F8FAFC] cursor-pointer transition-colors ${selected?.trip_id === t.trip_id ? "bg-[#EFF6FF]" : ""}`}
+                    className={`border-b border-[#F3F4F6] hover:bg-[#F4F6F5] cursor-pointer transition-colors ${selected?.trip_id === t.trip_id ? "bg-[#F0FDF4]" : ""}`}
                   >
                     <td className="py-2.5 px-3 text-xs font-mono text-[#9CA3AF]">{t.trip_id}</td>
                     <td className="py-2.5 px-3 text-xs text-[#374151]">{formatThaiDateShort(t.job_date)}</td>
@@ -180,7 +180,7 @@ export default function TripsPage() {
                   <p className="text-xs text-[#374151] leading-relaxed">{selected.pickup_address}</p>
                   {selected.google_map_link ? (
                     <a href={selected.google_map_link} target="_blank" rel="noopener noreferrer"
-                      className="text-xs text-[#2563EB] flex items-center gap-0.5 mt-0.5 hover:underline">
+                      className="text-xs text-[#1B4332] flex items-center gap-0.5 mt-0.5 hover:underline">
                       <MapPin size={10} /> ดูแผนที่
                     </a>
                   ) : (

@@ -1,7 +1,10 @@
+"use client";
+
 import { TopBar } from "@/components/layout/topbar";
 import { KpiCard } from "@/components/ui/kpi-card";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
-import { CostDonut } from "@/components/charts/cost-donut";
+import dynamic from "next/dynamic";
+const CostDonut = dynamic(() => import("@/components/charts/cost-donut").then(m => ({ default: m.CostDonut })), { ssr: false });
 import {
   trips,
   costRecords,
@@ -71,7 +74,7 @@ export default function CostsPage() {
                   { name: "ค่าทางด่วน", type: "Variable", amount: tollCost,   color: "" },
                   { name: `ต้นทุนคงที่ (${FIXED_PER_TRIP} ฿/รอบ × ${completed.length} รอบ)`, type: "Fixed", amount: fixedCostAllocated, color: "text-[#6B7280]" },
                 ].map((row) => (
-                  <tr key={row.name} className="border-b border-[#F3F4F6] hover:bg-[#F8FAFC]">
+                  <tr key={row.name} className="border-b border-[#F3F4F6] hover:bg-[#F4F6F5]">
                     <td className="py-2.5 px-3 font-medium">{row.name}</td>
                     <td className="py-2.5 px-3">
                       <span className={`text-xs px-1.5 py-0.5 rounded ${row.type === "Fixed" ? "bg-purple-50 text-purple-700" : "bg-blue-50 text-blue-700"}`}>
@@ -83,14 +86,14 @@ export default function CostsPage() {
                     <td className="py-2.5 px-3">
                       <div className="flex items-center gap-2">
                         <div className="w-20 bg-[#F3F4F6] rounded-full h-1.5">
-                          <div className="bg-[#2563EB] h-1.5 rounded-full" style={{ width: `${(row.amount / totalCost) * 100}%` }} />
+                          <div className="bg-[#1B4332] h-1.5 rounded-full" style={{ width: `${(row.amount / totalCost) * 100}%` }} />
                         </div>
                         <span className="text-xs text-[#6B7280]">{((row.amount / totalCost) * 100).toFixed(1)}%</span>
                       </div>
                     </td>
                   </tr>
                 ))}
-                <tr className="bg-[#F9FAFB] font-semibold">
+                <tr className="bg-[#FAFAFA] font-semibold">
                   <td className="py-2.5 px-3">รวมทั้งหมด</td>
                   <td className="py-2.5 px-3"></td>
                   <td className="py-2.5 px-3">{totalCost.toLocaleString("th-TH")} ฿</td>
@@ -140,7 +143,7 @@ export default function CostsPage() {
             <CardTitle>รายการต้นทุนเพิ่มเติม</CardTitle>
           </div>
           <table className="w-full text-sm">
-            <thead className="bg-[#F9FAFB]">
+            <thead className="bg-[#FAFAFA]">
               <tr>
                 {["Cost ID", "วันที่", "ประเภท", "จำนวน", "หมายเหตุ"].map((h) => (
                   <th key={h} className="py-2.5 px-3 text-xs font-semibold text-[#6B7280] text-left border-b border-[#E5E7EB]">{h}</th>
@@ -149,7 +152,7 @@ export default function CostsPage() {
             </thead>
             <tbody>
               {costRecords.map((c) => (
-                <tr key={c.cost_id} className="border-b border-[#F3F4F6] hover:bg-[#F8FAFC]">
+                <tr key={c.cost_id} className="border-b border-[#F3F4F6] hover:bg-[#F4F6F5]">
                   <td className="py-2.5 px-3 text-xs font-mono text-[#9CA3AF]">{c.cost_id}</td>
                   <td className="py-2.5 px-3 text-xs">{formatThaiDateShort(c.cost_date)}</td>
                   <td className="py-2.5 px-3">

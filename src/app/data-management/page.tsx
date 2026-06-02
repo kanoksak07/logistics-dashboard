@@ -45,8 +45,8 @@ export default function DataManagementPage() {
         <div className="grid grid-cols-4 gap-3">
           {sheets.map((s) => (
             <Card key={s.name} className="flex items-center gap-3 py-3">
-              <div className="w-8 h-8 rounded bg-[#EFF6FF] flex items-center justify-center shrink-0">
-                <Database size={14} className="text-[#2563EB]" />
+              <div className="w-8 h-8 rounded bg-[#F0FDF4] flex items-center justify-center shrink-0">
+                <Database size={14} className="text-[#1B4332]" />
               </div>
               <div>
                 <p className="text-sm font-semibold text-[#111827]">{s.name}</p>
@@ -99,7 +99,7 @@ export default function DataManagementPage() {
             <CardTitle>Field Dictionary (ตัวอย่าง)</CardTitle>
           </div>
           <table className="w-full text-sm">
-            <thead className="bg-[#F9FAFB]">
+            <thead className="bg-[#FAFAFA]">
               <tr>
                 {["Sheet", "Field", "ประเภท", "จำเป็น", "ตัวอย่าง"].map((h) => (
                   <th key={h} className="py-2.5 px-3 text-xs font-semibold text-[#6B7280] text-left border-b border-[#E5E7EB]">{h}</th>
@@ -108,8 +108,8 @@ export default function DataManagementPage() {
             </thead>
             <tbody>
               {fieldDictionary.map((f, i) => (
-                <tr key={i} className="border-b border-[#F3F4F6] hover:bg-[#F8FAFC]">
-                  <td className="py-2 px-3 text-xs font-mono text-[#2563EB]">{f.sheet}</td>
+                <tr key={i} className="border-b border-[#F3F4F6] hover:bg-[#F4F6F5]">
+                  <td className="py-2 px-3 text-xs font-mono text-[#1B4332]">{f.sheet}</td>
                   <td className="py-2 px-3 text-xs font-mono text-[#374151]">{f.field}</td>
                   <td className="py-2 px-3">
                     <span className="text-xs px-1.5 py-0.5 rounded bg-gray-100 text-gray-700">{f.type}</span>
@@ -137,7 +137,7 @@ export default function DataManagementPage() {
               { step: "4", title: "เพิ่มต้นทุนเพิ่มเติม", detail: "ไปที่ Sheet 'costs' → เพิ่มแถวใหม่ → กรอก cost_date, cost_category, cost_amount" },
             ].map((g) => (
               <div key={g.step} className="flex gap-3">
-                <div className="w-6 h-6 rounded-full bg-[#EFF6FF] text-[#2563EB] text-xs font-bold flex items-center justify-center shrink-0">
+                <div className="w-6 h-6 rounded-full bg-[#F0FDF4] text-[#1B4332] text-xs font-bold flex items-center justify-center shrink-0">
                   {g.step}
                 </div>
                 <div>

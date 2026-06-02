@@ -81,7 +81,7 @@ export default function LineImportPage() {
             <CardTitle>ข้อความ LINE ทั้งหมด</CardTitle>
           </div>
           <table className="w-full text-sm">
-            <thead className="bg-[#F9FAFB]">
+            <thead className="bg-[#FAFAFA]">
               <tr>
                 {["Message ID", "เวลา", "ผู้ส่ง", "ข้อความ", "Import", "Parse", "เหตุผล"].map((h) => (
                   <th key={h} className="py-2.5 px-3 text-xs font-semibold text-[#6B7280] text-left border-b border-[#E5E7EB]">{h}</th>
@@ -92,7 +92,7 @@ export default function LineImportPage() {
               {lineMessages.map((m) => {
                 const parsed = parsedStatusConfig[m.parsed_status];
                 return (
-                  <tr key={m.line_message_id} className="border-b border-[#F3F4F6] hover:bg-[#F8FAFC]">
+                  <tr key={m.line_message_id} className="border-b border-[#F3F4F6] hover:bg-[#F4F6F5]">
                     <td className="py-2.5 px-3 text-xs font-mono text-[#9CA3AF]">{m.line_message_id}</td>
                     <td className="py-2.5 px-3 text-xs text-[#374151] whitespace-nowrap">
                       <div>{formatThaiDateShort(m.message_datetime.split("T")[0])}</div>

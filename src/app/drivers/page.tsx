@@ -77,7 +77,7 @@ export default function DriversPage() {
             <CardTitle>ตารางอันดับคนขับ</CardTitle>
           </div>
           <table className="w-full text-sm">
-            <thead className="bg-[#F9FAFB]">
+            <thead className="bg-[#FAFAFA]">
               <tr>
                 {["อันดับ", "คนขับ", "รอบที่รับ", "รอบเสร็จ", "ยกเลิก", "ค่าจ้างรวม", "รายได้รวม", "กำไรรวม", "กำไรเฉลี่ย/รอบ", "อัตราสำเร็จ"].map((h) => (
                   <th key={h} className="py-2.5 px-3 text-xs font-semibold text-[#6B7280] text-left border-b border-[#E5E7EB]">{h}</th>
@@ -88,7 +88,7 @@ export default function DriversPage() {
               {stats.map((d, i) => {
                 const rate = d.assigned > 0 ? (d.completed / d.assigned) * 100 : 0;
                 return (
-                  <tr key={d.driver_id} className="border-b border-[#F3F4F6] hover:bg-[#F8FAFC]">
+                  <tr key={d.driver_id} className="border-b border-[#F3F4F6] hover:bg-[#F4F6F5]">
                     <td className="py-2.5 px-3">
                       <span className={`text-xs font-bold ${i === 0 ? "text-yellow-500" : i === 1 ? "text-gray-400" : i === 2 ? "text-amber-600" : "text-[#9CA3AF]"}`}>
                         {i + 1}
@@ -109,7 +109,7 @@ export default function DriversPage() {
                     <td className="py-2.5 px-3">
                       <div className="flex items-center gap-2">
                         <div className="w-16 bg-[#F3F4F6] rounded-full h-1.5">
-                          <div className="bg-[#2563EB] h-1.5 rounded-full" style={{ width: `${rate}%` }} />
+                          <div className="bg-[#1B4332] h-1.5 rounded-full" style={{ width: `${rate}%` }} />
                         </div>
                         <span className="text-xs text-[#6B7280]">{rate.toFixed(0)}%</span>
                       </div>
