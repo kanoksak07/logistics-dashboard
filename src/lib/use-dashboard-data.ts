@@ -116,18 +116,23 @@ export function useDashboardData(): DashboardData {
       const json = await res.json();
       const realTrips = (json.trips || []).map(sheetRowToTrip);
 
-      // ถ้า Sheets ยังไม่มีข้อมูล trips ให้ใช้ mock data แทน
+      const realCosts = (json.costs || []).map(sheetRowToCost);
+      const realDrivers = (json.drivers || []).map(sheetRowToDriver);
+      const realVehicles = (json.vehicles || []).map(sheetRowToVehicle);
+
+      // ถ้า Sheets ยังไม่มีข้อมูล trips ให้ใช้ mock trips แทน
+      // แต่ costs/drivers/vehicles ใช้ข้อมูลจริงถ้ามี
       if (realTrips.length === 0) {
         const { trips: mockTrips, drivers: mockDrivers, vehicles: mockVehicles, costRecords: mockCosts } = await import("./mock-data");
         setData({
           trips: mockTrips,
-          drivers: (json.drivers || []).length > 0 ? (json.drivers || []).map(sheetRowToDriver) : mockDrivers,
-          vehicles: (json.vehicles || []).length > 0 ? (json.vehicles || []).map(sheetRowToVehicle) : mockVehicles,
-          costs: (json.costs || []).length > 0 ? (json.costs || []).map(sheetRowToCost) : mockCosts,
+          drivers: realDrivers.length > 0 ? realDrivers : mockDrivers,
+          vehicles: realVehicles.length > 0 ? realVehicles : mockVehicles,
+          costs: realCosts.length > 0 ? realCosts : mockCosts,
           settings: Object.keys(json.settings || {}).length > 0 ? json.settings : {},
           lastUpdated: new Date(),
           isLoading: false,
-          isUsingMockData: true,
+          isUsingMockData: true, // trips ยังเป็น mock
           error: null,
         });
         return;
@@ -135,9 +140,9 @@ export function useDashboardData(): DashboardData {
 
       setData({
         trips: realTrips,
-        drivers: (json.drivers || []).map(sheetRowToDriver),
-        vehicles: (json.vehicles || []).map(sheetRowToVehicle),
-        costs: (json.costs || []).map(sheetRowToCost),
+        drivers: realDrivers,
+        vehicles: realVehicles,
+        costs: realCosts,
         settings: json.settings || {},
         lastUpdated: new Date(),
         isLoading: false,

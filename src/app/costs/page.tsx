@@ -32,7 +32,7 @@ export default function CostsPage() {
 
   return (
     <>
-      <TopBar title="ต้นทุน" subtitle="มิถุนายน 2569" lastUpdated={lastUpdated} isUsingMockData={isUsingMockData} onRefresh={refresh} />
+      <TopBar title="ต้นทุน" subtitle="มิถุนายน 2569" lastUpdated={lastUpdated} onRefresh={refresh} />
       <div className="p-3 md:p-6 space-y-3 md:space-y-5">
 
         {/* KPIs */}
