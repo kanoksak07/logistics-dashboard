@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
-// Apps Script URL — รับข้อมูลจาก Vercel แล้วเขียนลง Google Sheets
-const APPS_SCRIPT_URL = process.env.APPS_SCRIPT_URL || "https://script.google.com/macros/s/AKfycbzbs_2cuVaO3JhisPdtorJxNg4BqYrQG63SrEVptkl7hRG1AGYs2UhcP8WxvssHIy_KIw/exec";
+const APPS_SCRIPT_URL = process.env.APPS_SCRIPT_URL || "";
+const ALLOWED_GROUP_ID = process.env.LINE_GROUP_ID || "";
 
 // LINE webhook verification (GET)
 export async function GET() {
@@ -17,9 +17,13 @@ export async function POST(req: NextRequest) {
     for (const event of events) {
       if (event.type !== "message" || event.message?.type !== "text") continue;
 
+      const groupId: string = event.source?.groupId || "";
+
+      // รับเฉพาะข้อความจากกลุ่มที่กำหนด
+      if (ALLOWED_GROUP_ID && groupId !== ALLOWED_GROUP_ID) continue;
+
       const text: string = event.message.text;
       const senderId: string = event.source?.userId || "unknown";
-      const groupId: string = event.source?.groupId || "";
       const messageId: string = event.message.id;
       const messageTime = new Date(event.timestamp).toISOString();
 
