@@ -145,20 +145,21 @@ export default function CostsPage() {
           <table className="w-full text-sm">
             <thead className="bg-[#FAFAFA]">
               <tr>
-                {["Cost ID", "วันที่", "ประเภท", "จำนวน", "หมายเหตุ"].map((h) => (
+                {["วันที่", "ประเภท", "รายการ", "จำนวน", "ผู้จ่าย", "หมายเหตุ"].map((h) => (
                   <th key={h} className="py-2.5 px-3 text-xs font-semibold text-[#6B7280] text-left border-b border-[#E5E7EB]">{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {costRecords.map((c) => (
-                <tr key={c.cost_id} className="border-b border-[#F3F4F6] hover:bg-[#F4F6F5]">
-                  <td className="py-2.5 px-3 text-xs font-mono text-[#9CA3AF]">{c.cost_id}</td>
+              {costRecords.map((c, i) => (
+                <tr key={i} className="border-b border-[#F3F4F6] hover:bg-[#F4F6F5]">
                   <td className="py-2.5 px-3 text-xs">{formatThaiDateShort(c.cost_date)}</td>
                   <td className="py-2.5 px-3">
                     <span className="text-xs px-1.5 py-0.5 rounded bg-gray-100 text-gray-700">{c.cost_category}</span>
                   </td>
+                  <td className="py-2.5 px-3 font-medium">{c.cost_name}</td>
                   <td className="py-2.5 px-3 font-medium">{c.cost_amount.toLocaleString("th-TH")} ฿</td>
+                  <td className="py-2.5 px-3 text-xs text-[#6B7280]">{c.who_paid || "—"}</td>
                   <td className="py-2.5 px-3 text-xs text-[#6B7280]">{c.remark}</td>
                 </tr>
               ))}

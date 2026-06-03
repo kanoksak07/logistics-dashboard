@@ -165,10 +165,10 @@ export default function VehiclePage() {
               </tr>
             </thead>
             <tbody>
-              {maintenanceRecords.map((c) => (
-                <tr key={c.cost_id} className="border-b border-[#F3F4F6] hover:bg-[#F4F6F5]">
+              {maintenanceRecords.map((c, i) => (
+                <tr key={i} className="border-b border-[#F3F4F6] hover:bg-[#F4F6F5]">
                   <td className="py-2.5 px-4 text-xs">{formatThaiDateShort(c.cost_date)}</td>
-                  <td className="py-2.5 px-4">{c.remark}</td>
+                  <td className="py-2.5 px-4">{c.cost_name || c.remark}</td>
                   <td className="py-2.5 px-4 font-medium">{c.cost_amount.toLocaleString("th-TH")} ฿</td>
                 </tr>
               ))}
