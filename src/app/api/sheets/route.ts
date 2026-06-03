@@ -6,11 +6,11 @@ export async function GET(req: NextRequest) {
   const sheet = req.nextUrl.searchParams.get("sheet") || "all";
 
   const isConfigured =
-    process.env.SPREADSHEET_ID && process.env.GOOGLE_SERVICE_ACCOUNT_KEY;
+    process.env.SPREADSHEET_ID && process.env.GOOGLE_API_KEY;
 
   if (!isConfigured) {
     return NextResponse.json(
-      { error: "Google Sheets not configured. Set SPREADSHEET_ID and GOOGLE_SERVICE_ACCOUNT_KEY in .env.local" },
+      { error: "Google Sheets not configured. Set SPREADSHEET_ID and GOOGLE_API_KEY in .env.local" },
       { status: 503 }
     );
   }

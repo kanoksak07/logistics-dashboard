@@ -1,38 +1,29 @@
-import { google } from "googleapis";
+/**
+ * Google Sheets Integration
+ * ใช้ API Key (ง่ายกว่า Service Account) — Sheet ต้อง "Anyone with link can view"
+ */
 
-// ====================================
-// Google Sheets Client (Server-side only)
-// ====================================
-
-function getAuth() {
-  const key = process.env.GOOGLE_SERVICE_ACCOUNT_KEY;
-  if (!key) throw new Error("GOOGLE_SERVICE_ACCOUNT_KEY is not set");
-
-  const credentials = JSON.parse(key);
-  return new google.auth.GoogleAuth({
-    credentials,
-    scopes: ["https://www.googleapis.com/auth/spreadsheets.readonly"],
-  });
-}
+const SPREADSHEET_ID = process.env.SPREADSHEET_ID || "";
+const API_KEY = process.env.GOOGLE_API_KEY || "";
+const BASE_URL = "https://sheets.googleapis.com/v4/spreadsheets";
 
 export async function getSheetData(sheetName: string): Promise<string[][]> {
-  const spreadsheetId = process.env.SPREADSHEET_ID;
-  if (!spreadsheetId) throw new Error("SPREADSHEET_ID is not set");
+  if (!SPREADSHEET_ID || !API_KEY) {
+    throw new Error("SPREADSHEET_ID หรือ GOOGLE_API_KEY ยังไม่ได้ตั้งค่า");
+  }
 
-  const auth = getAuth();
-  const sheets = google.sheets({ version: "v4", auth });
+  const range = encodeURIComponent(`${sheetName}!A:Z`);
+  const url = `${BASE_URL}/${SPREADSHEET_ID}/values/${range}?key=${API_KEY}`;
 
-  const response = await sheets.spreadsheets.values.get({
-    spreadsheetId,
-    range: `${sheetName}!A:Z`,
-  });
+  const res = await fetch(url, { next: { revalidate: 300 } }); // cache 5 min
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err?.error?.message || `HTTP ${res.status}`);
+  }
 
-  return (response.data.values as string[][]) || [];
+  const data = await res.json();
+  return (data.values as string[][]) || [];
 }
-
-// ====================================
-// Parse helpers — converts raw 2D array to typed objects
-// ====================================
 
 export function rowsToObjects<T extends Record<string, string>>(
   rows: string[][]
@@ -44,45 +35,37 @@ export function rowsToObjects<T extends Record<string, string>>(
     .map((row) => {
       const obj: Record<string, string> = {};
       headers.forEach((h, i) => {
-        obj[h.trim()] = row[i]?.trim() ?? "";
+        obj[h.trim()] = (row[i] ?? "").trim();
       });
       return obj as T;
     });
 }
 
-// ====================================
-// Typed fetchers
-// ====================================
-
 export async function fetchTrips() {
-  const rows = await getSheetData("trips");
-  return rowsToObjects(rows);
+  return rowsToObjects(await getSheetData("trips"));
 }
 
 export async function fetchDrivers() {
-  const rows = await getSheetData("drivers");
-  return rowsToObjects(rows);
+  return rowsToObjects(await getSheetData("drivers"));
 }
 
 export async function fetchVehicles() {
-  const rows = await getSheetData("vehicles");
-  return rowsToObjects(rows);
+  return rowsToObjects(await getSheetData("vehicles"));
 }
 
 export async function fetchCosts() {
-  const rows = await getSheetData("costs");
-  return rowsToObjects(rows);
+  return rowsToObjects(await getSheetData("costs"));
 }
 
 export async function fetchSettings() {
-  const rows = await getSheetData("settings");
-  const objects = rowsToObjects<{ setting_name: string; setting_value: string }>(rows);
+  const rows = rowsToObjects<{ setting_name: string; setting_value: string }>(
+    await getSheetData("settings")
+  );
   const map: Record<string, string> = {};
-  objects.forEach((s) => { map[s.setting_name] = s.setting_value; });
+  rows.forEach((s) => { map[s.setting_name] = s.setting_value; });
   return map;
 }
 
 export async function fetchLineMessages() {
-  const rows = await getSheetData("line_raw_messages");
-  return rowsToObjects(rows);
+  return rowsToObjects(await getSheetData("line_raw_messages"));
 }
