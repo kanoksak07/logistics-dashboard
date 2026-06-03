@@ -116,18 +116,18 @@ export default function OverviewPage() {
         isUsingMockData={isUsingMockData}
         onRefresh={refresh}
       />
-      <div className="p-6 space-y-5">
+      <div className="p-3 md:p-6 space-y-3 md:space-y-5">
 
         {/* Loading */}
         {isLoading && (
           <div className="flex items-center gap-2 text-sm text-[#6B7280]">
             <Loader2 size={14} className="animate-spin" />
-            กำลังโหลดข้อมูลจาก Google Sheets...
+            กำลังโหลดข้อมูล...
           </div>
         )}
 
-        {/* KPI Row 1 */}
-        <div className="grid grid-cols-4 gap-4">
+        {/* KPI Row 1 — mobile: 2 cols, desktop: 4 cols */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
           <KpiCard featured label="รายได้รวม" value={formatBaht(s.totalRevenue)} change={12.4} changeLabel="vs เดือนก่อน" icon={<DollarSign size={14} />} />
           <KpiCard label="ต้นทุนรวม" value={formatBaht(s.totalCost)} change={8.1} changeLabel="vs เดือนก่อน" icon={<DollarSign size={14} />} />
           <KpiCard label="กำไรสุทธิ" value={formatBaht(s.netProfit)} change={profitChange} changeLabel="vs เดือนก่อน" icon={<TrendingUp size={14} />} valueColor={s.netProfit >= 0 ? "text-[#1B4332]" : "text-red-600"} />
@@ -135,21 +135,21 @@ export default function OverviewPage() {
         </div>
 
         {/* KPI Row 2 */}
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
           <KpiCard
             label="จำนวนรอบ"
             value={`${formatNumber(trips.length)} รอบ`}
-            subValue={`เสร็จ ${s.completed.length} | ยกเลิก ${cancelledCount} | รอ ${pendingCount}`}
+            subValue={`เสร็จ ${s.completed.length} | ยกเลิก ${cancelledCount}`}
             icon={<Hash size={14} />}
           />
-          <KpiCard label="รายได้เฉลี่ย/รอบ" value={formatBaht(Math.round(s.avgRevPerTrip))} icon={<DollarSign size={14} />} />
-          <KpiCard label="ต้นทุนเฉลี่ย/รอบ" value={formatBaht(Math.round(s.avgCostPerTrip))} icon={<DollarSign size={14} />} />
-          <KpiCard label="กำไรเฉลี่ย/รอบ" value={formatBaht(Math.round(s.avgProfitPerTrip))} valueColor={s.avgProfitPerTrip >= 150 ? "text-[#1B4332]" : "text-red-600"} icon={<TrendingUp size={14} />} />
+          <KpiCard label="รายได้/รอบ" value={formatBaht(Math.round(s.avgRevPerTrip))} icon={<DollarSign size={14} />} />
+          <KpiCard label="ต้นทุน/รอบ" value={formatBaht(Math.round(s.avgCostPerTrip))} icon={<DollarSign size={14} />} />
+          <KpiCard label="กำไร/รอบ" value={formatBaht(Math.round(s.avgProfitPerTrip))} valueColor={s.avgProfitPerTrip >= 150 ? "text-[#1B4332]" : "text-red-600"} icon={<TrendingUp size={14} />} />
         </div>
 
-        {/* Charts */}
-        <div className="grid grid-cols-3 gap-4">
-          <Card className="col-span-2">
+        {/* Charts — mobile: stack, desktop: 2/3 + 1/3 */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
+          <Card className="md:col-span-2">
             <CardHeader><CardTitle>รายได้ ต้นทุน และกำไร (6 เดือน)</CardTitle></CardHeader>
             <TrendChart data={trendData} />
           </Card>
@@ -165,9 +165,9 @@ export default function OverviewPage() {
           <TripBar data={tripBarData} />
         </Card>
 
-        {/* Bottom Row */}
-        <div className="grid grid-cols-3 gap-4">
-          <div className="col-span-2">
+        {/* Bottom Row — mobile: stack, desktop: 2/3 + 1/3 */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
+          <div className="md:col-span-2">
             <Card className="p-0 overflow-hidden">
               <div className="px-4 py-3 border-b border-[#E5E7EB]">
                 <CardTitle>งานล่าสุด</CardTitle>
@@ -178,32 +178,36 @@ export default function OverviewPage() {
                   <p className="text-xs">เพิ่มข้อมูลใน Google Sheets Sheet "trips"</p>
                 </div>
               ) : (
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="bg-[#FAFAFA]">
-                      {["Job ID","วันที่","ลูกค้า","คนขับ","รายได้","กำไร","สถานะ"].map(h => (
-                        <th key={h} className={`py-2 px-3 text-xs font-semibold text-[#6B7280] ${["รายได้","กำไร"].includes(h) ? "text-right" : "text-left"}`}>{h}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {recentTrips.map(t => (
-                      <tr key={t.trip_id} className="border-t border-[#F3F4F6] hover:bg-[#F4F6F5] transition-colors">
-                        <td className="py-2 px-3 text-xs font-mono text-[#9CA3AF]">{t.trip_id}</td>
-                        <td className="py-2 px-3 text-xs text-[#374151]">{formatThaiDateShort(t.job_date)}</td>
-                        <td className="py-2 px-3 text-sm">{t.customer_name}</td>
-                        <td className="py-2 px-3 text-sm text-[#374151]">
-                          {t.assigned_driver_name ?? <span className="text-red-500 text-xs">ไม่มีคนขับ</span>}
-                        </td>
-                        <td className="py-2 px-3 text-sm text-right">{t.trip_revenue.toLocaleString("th-TH")}</td>
-                        <td className={`py-2 px-3 text-sm text-right font-medium ${t.net_profit >= 0 ? "text-[#1B4332]" : "text-red-600"}`}>
-                          {t.trip_status === "completed" ? t.net_profit.toLocaleString("th-TH") : "—"}
-                        </td>
-                        <td className="py-2 px-3"><StatusBadge status={t.trip_status} /></td>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm min-w-[500px]">
+                    <thead>
+                      <tr className="bg-[#FAFAFA]">
+                        <th className="py-2 px-3 text-xs font-semibold text-[#6B7280] text-left">วันที่</th>
+                        <th className="py-2 px-3 text-xs font-semibold text-[#6B7280] text-left">ลูกค้า</th>
+                        <th className="py-2 px-3 text-xs font-semibold text-[#6B7280] text-left hidden sm:table-cell">คนขับ</th>
+                        <th className="py-2 px-3 text-xs font-semibold text-[#6B7280] text-right">รายได้</th>
+                        <th className="py-2 px-3 text-xs font-semibold text-[#6B7280] text-right hidden sm:table-cell">กำไร</th>
+                        <th className="py-2 px-3 text-xs font-semibold text-[#6B7280] text-left">สถานะ</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {recentTrips.map(t => (
+                        <tr key={t.trip_id} className="border-t border-[#F3F4F6] hover:bg-[#F4F6F5] transition-colors">
+                          <td className="py-2.5 px-3 text-xs text-[#374151] whitespace-nowrap">{formatThaiDateShort(t.job_date)}</td>
+                          <td className="py-2.5 px-3 text-sm font-medium">{t.customer_name}</td>
+                          <td className="py-2.5 px-3 text-sm text-[#374151] hidden sm:table-cell">
+                            {t.assigned_driver_name ?? <span className="text-red-500 text-xs">ไม่มีคนขับ</span>}
+                          </td>
+                          <td className="py-2.5 px-3 text-sm text-right whitespace-nowrap">{t.trip_revenue.toLocaleString("th-TH")}</td>
+                          <td className={`py-2.5 px-3 text-sm text-right font-medium hidden sm:table-cell whitespace-nowrap ${t.net_profit >= 0 ? "text-[#1B4332]" : "text-red-600"}`}>
+                            {t.trip_status === "completed" ? t.net_profit.toLocaleString("th-TH") : "—"}
+                          </td>
+                          <td className="py-2.5 px-3"><StatusBadge status={t.trip_status} /></td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               )}
             </Card>
           </div>

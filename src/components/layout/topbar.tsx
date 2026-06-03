@@ -23,32 +23,31 @@ export function TopBar({ title, subtitle, lastUpdated, isUsingMockData, onRefres
 
   const updatedText = lastUpdated
     ? lastUpdated.toLocaleTimeString("th-TH", { hour: "2-digit", minute: "2-digit" }) + " น."
-    : "21 มิ.ย. 2569";
+    : null;
 
   return (
-    <div className="h-16 flex items-center justify-between px-6 bg-white border-b border-[#E5E7EB] sticky top-0 z-20">
+    <div className="h-14 md:h-16 flex items-center justify-between px-4 md:px-6 bg-white border-b border-[#E5E7EB] sticky top-0 z-20">
       <div>
-        <h1 className="text-lg font-bold text-[#1A1A1A]">{title}</h1>
-        {subtitle && <p className="text-xs text-[#6B7280] mt-0.5">{subtitle}</p>}
+        <h1 className="text-base md:text-lg font-bold text-[#1A1A1A]">{title}</h1>
+        {subtitle && <p className="text-[10px] md:text-xs text-[#6B7280]">{subtitle}</p>}
       </div>
 
-      <div className="flex items-center gap-3">
-        {/* Mock Data Badge */}
+      <div className="flex items-center gap-2">
         {isUsingMockData && (
-          <div className="flex items-center gap-1.5 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-full px-2.5 py-1">
-            <AlertCircle size={11} />
-            <span>ข้อมูลจำลอง — ยังไม่ได้เชื่อม Sheets</span>
+          <div className="hidden sm:flex items-center gap-1 text-[10px] text-amber-700 bg-amber-50 border border-amber-200 rounded-full px-2 py-1">
+            <AlertCircle size={10} />
+            <span>ข้อมูลจำลอง</span>
           </div>
         )}
-        {!isUsingMockData && lastUpdated && (
-          <span className="text-xs text-[#9CA3AF]">อัปเดตล่าสุด: {updatedText}</span>
+        {!isUsingMockData && updatedText && (
+          <span className="hidden sm:block text-xs text-[#9CA3AF]">{updatedText}</span>
         )}
         <button
           onClick={handleRefresh}
-          className="flex items-center gap-1.5 text-xs font-medium text-[#1B4332] border border-[#C8D5C8] rounded-lg px-3 py-1.5 hover:bg-[#F0FDF4] transition-colors"
+          className="flex items-center gap-1 text-xs font-medium text-[#1B4332] border border-[#C8D5C8] rounded-lg px-2.5 py-1.5 hover:bg-[#F0FDF4] transition-colors"
         >
           <RefreshCw size={12} className={cn(refreshing && "animate-spin")} />
-          รีเฟรช
+          <span className="hidden sm:inline">รีเฟรช</span>
         </button>
       </div>
     </div>
