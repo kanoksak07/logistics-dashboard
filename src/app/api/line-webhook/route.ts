@@ -30,8 +30,11 @@ export async function POST(req: NextRequest) {
       // Parse ข้อความงาน
       const parsed = parseJobMessage(text);
 
+      // เก็บเฉพาะข้อความที่ parse ได้ (มี maps link, รหัสคลัง, หรือเวลา)
+      // ข้อความทั่วไปเช่น "ทดสอบ", "โอเค" จะถูกข้าม
+      if (parsed.confidence === "failed") continue;
+
       // ส่งไป Apps Script เพื่อบันทึกลง Google Sheets
-      // ใช้ fetch แบบ no-wait เพื่อไม่ให้ LINE timeout
       fetch(APPS_SCRIPT_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
