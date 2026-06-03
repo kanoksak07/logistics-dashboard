@@ -43,21 +43,21 @@ export default function RevenuePage() {
   return (
     <>
       <TopBar title="รายได้ & กำไร" subtitle="มิถุนายน 2569" />
-      <div className="p-6 space-y-5">
+      <div className="p-3 md:p-6 space-y-3 md:space-y-5">
 
-        <div className="grid grid-cols-3 gap-4">
+        {/* KPI row 1 */}
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-4">
           <KpiCard label="รายได้รวม" value={formatBaht(totalRevenue)} change={12.4} changeLabel="vs เดือนก่อน" />
           <KpiCard label="กำไรสุทธิ" value={formatBaht(netProfit)} valueColor="text-green-700" change={11.2} changeLabel="vs เดือนก่อน" />
           <KpiCard label="Profit Margin" value={formatPercent(profitMargin)} change={1.5} changeLabel="vs เดือนก่อน" />
         </div>
 
-        <div className="grid grid-cols-3 gap-4">
-          <KpiCard label="รายได้เฉลี่ย/รอบ" value={formatBaht(Math.round(avgRevPerTrip))} />
-          <KpiCard label="กำไรเฉลี่ย/รอบ" value={formatBaht(Math.round(avgProfitPerTrip))} valueColor={avgProfitPerTrip >= 150 ? "text-green-700" : "text-red-700"} />
-          <div className="grid grid-cols-2 gap-4">
-            <KpiCard label="รอบที่กำไร" value={`${profitable.length} รอบ`} valueColor="text-green-700" />
-            <KpiCard label="รอบที่ขาดทุน" value={`${unprofitable.length} รอบ`} valueColor="text-red-700" />
-          </div>
+        {/* KPI row 2 */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
+          <KpiCard label="รายได้/รอบ" value={formatBaht(Math.round(avgRevPerTrip))} />
+          <KpiCard label="กำไร/รอบ" value={formatBaht(Math.round(avgProfitPerTrip))} valueColor={avgProfitPerTrip >= 150 ? "text-green-700" : "text-red-700"} />
+          <KpiCard label="รอบที่กำไร" value={`${profitable.length} รอบ`} valueColor="text-green-700" />
+          <KpiCard label="รอบที่ขาดทุน" value={`${unprofitable.length} รอบ`} valueColor="text-red-700" />
         </div>
 
         {/* Trend */}
@@ -71,34 +71,31 @@ export default function RevenuePage() {
           <div className="px-4 py-3 border-b border-[#E5E7EB]">
             <CardTitle>เปรียบเทียบรายเดือน</CardTitle>
           </div>
-          <table className="w-full text-sm">
-            <thead className="bg-[#FAFAFA]">
-              <tr>
-                {["เดือน", "รายได้", "ต้นทุน", "กำไร", "จำนวนรอบ", "กำไร/รอบ"].map((h) => (
-                  <th key={h} className="py-2.5 px-3 text-xs font-semibold text-[#6B7280] text-left border-b border-[#E5E7EB]">{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {trendData.filter((m) => m.revenue > 0).map((m) => (
-                <tr key={m.month} className={`border-b border-[#F3F4F6] hover:bg-[#F4F6F5] ${m.month === "มิ.ย." ? "bg-blue-50/50" : ""}`}>
-                  <td className="py-2.5 px-3 font-medium">{m.month}{m.month === "มิ.ย." && <span className="ml-1 text-xs text-[#1B4332]">(ปัจจุบัน)</span>}</td>
-                  <td className="py-2.5 px-3">{m.revenue.toLocaleString("th-TH")} ฿</td>
-                  <td className="py-2.5 px-3">{m.cost.toLocaleString("th-TH")} ฿</td>
-                  <td className={`py-2.5 px-3 font-medium ${m.profit >= 0 ? "text-green-700" : "text-red-600"}`}>
-                    {m.profit.toLocaleString("th-TH")} ฿
-                  </td>
-                  <td className="py-2.5 px-3">{"trips" in m && m.trips > 0 ? m.trips : completed.length}</td>
-                  <td className="py-2.5 px-3 text-[#6B7280]">
-                    {"trips" in m && m.trips > 0 ? Math.round(m.profit / m.trips).toLocaleString("th-TH") : Math.round(netProfit / n).toLocaleString("th-TH")} ฿
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm min-w-[400px]">
+              <thead className="bg-[#FAFAFA]">
+                <tr>
+                  {["เดือน", "รายได้", "กำไร", "รอบ", "กำไร/รอบ"].map((h) => (
+                    <th key={h} className="py-2.5 px-3 text-xs font-semibold text-[#6B7280] text-left border-b border-[#E5E7EB]">{h}</th>
+                  ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {trendData.filter((m) => m.revenue > 0).map((m) => (
+                  <tr key={m.month} className={`border-b border-[#F3F4F6] ${m.month === "มิ.ย." ? "bg-[#F0FDF4]" : ""}`}>
+                    <td className="py-2.5 px-3 font-medium whitespace-nowrap">{m.month}{m.month === "มิ.ย." && <span className="ml-1 text-[10px] text-[#1B4332]">▶</span>}</td>
+                    <td className="py-2.5 px-3 whitespace-nowrap">{m.revenue.toLocaleString("th-TH")}</td>
+                    <td className={`py-2.5 px-3 font-medium whitespace-nowrap ${m.profit >= 0 ? "text-green-700" : "text-red-600"}`}>{m.profit.toLocaleString("th-TH")}</td>
+                    <td className="py-2.5 px-3">{"trips" in m && m.trips > 0 ? m.trips : completed.length}</td>
+                    <td className="py-2.5 px-3 text-[#6B7280] whitespace-nowrap">{"trips" in m && m.trips > 0 ? Math.round(m.profit / m.trips).toLocaleString("th-TH") : Math.round(netProfit / n).toLocaleString("th-TH")} ฿</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </Card>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
           {/* Profit by Driver */}
           <Card>
             <CardHeader><CardTitle>กำไรแยกตามคนขับ</CardTitle></CardHeader>
