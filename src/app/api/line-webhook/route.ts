@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const SPREADSHEET_ID = process.env.SPREADSHEET_ID || "";
-const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY || "";
-const LINE_CHANNEL_SECRET = process.env.LINE_CHANNEL_SECRET || "";
+// Apps Script URL — รับข้อมูลจาก Vercel แล้วเขียนลง Google Sheets
+const APPS_SCRIPT_URL = process.env.APPS_SCRIPT_URL || "https://script.google.com/macros/s/AKfycbzbs_2cuVaO3JhisPdtorJxNg4BqYrQG63SrEVptkl7hRG1AGYs2UhcP8WxvssHIy_KIw/exec";
 
 // LINE webhook verification (GET)
 export async function GET() {
@@ -19,97 +18,94 @@ export async function POST(req: NextRequest) {
       if (event.type !== "message" || event.message?.type !== "text") continue;
 
       const text: string = event.message.text;
-      const sender: string = event.source?.userId || "unknown";
+      const senderId: string = event.source?.userId || "unknown";
       const groupId: string = event.source?.groupId || "";
       const messageId: string = event.message.id;
-      const now = new Date().toISOString();
+      const messageTime = new Date(event.timestamp).toISOString();
 
-      // Parse job message
+      // Parse ข้อความงาน
       const parsed = parseJobMessage(text);
 
-      // Write to Google Sheets via Apps Script (POST)
-      await writeToSheets({
-        messageId,
-        groupId,
-        sender,
-        text,
-        now,
-        parsed,
-      });
+      // ส่งไป Apps Script เพื่อบันทึกลง Google Sheets
+      // ใช้ fetch แบบ no-wait เพื่อไม่ให้ LINE timeout
+      fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "saveLineMessage",
+          messageId,
+          groupId,
+          senderId,
+          text,
+          messageTime,
+          parsed,
+        }),
+      }).catch(() => {}); // ignore Apps Script errors
     }
 
     return NextResponse.json({ status: "ok" });
   } catch (err) {
     console.error("LINE webhook error:", err);
-    return NextResponse.json({ status: "error" }, { status: 200 }); // Always return 200 to LINE
+    return NextResponse.json({ status: "ok" }); // Always 200 to LINE
   }
 }
 
 interface ParsedJob {
-  job_id: string;
-  pickup_date: string;
-  pickup_time: string;
-  customer_name: string;
-  customer_phone: string;
-  pickup_address: string;
-  google_map_link: string;
-  warehouse_name: string;
-  assigned_driver_name: string;
-  expected_fee: string;
-  remark: string;
+  maps_links: string[];
+  phone: string;
+  warehouse_code: string;
+  time: string;
+  quantity: string;
+  vehicle_type: string;
+  job_type: string; // "numbered" | "LH" | "unknown"
+  raw_text: string;
   confidence: "success" | "partial" | "failed";
-  errors: string[];
 }
 
 function parseJobMessage(text: string): ParsedJob {
   const result: ParsedJob = {
-    job_id: "", pickup_date: "", pickup_time: "",
-    customer_name: "", customer_phone: "", pickup_address: "",
-    google_map_link: "", warehouse_name: "", assigned_driver_name: "",
-    expected_fee: "640", remark: "",
-    confidence: "success", errors: [],
+    maps_links: [],
+    phone: "",
+    warehouse_code: "",
+    time: "",
+    quantity: "",
+    vehicle_type: "",
+    job_type: "unknown",
+    raw_text: text,
+    confidence: "failed",
   };
 
-  const fieldMap: Record<string, keyof ParsedJob> = {
-    "job id": "job_id", "วันที่รับ": "pickup_date", "เวลารับ": "pickup_time",
-    "ชื่อลูกค้า": "customer_name", "เบอร์โทร": "customer_phone",
-    "ที่อยู่รับ": "pickup_address", "google map": "google_map_link",
-    "โกดัง": "warehouse_name", "คนขับ": "assigned_driver_name",
-    "ค่าบริการ": "expected_fee", "หมายเหตุ": "remark",
-  };
+  // Google Maps links
+  const mapsRegex = /https?:\/\/(?:maps\.app\.goo\.gl|goo\.gl\/maps|maps\.google\.com)\/[\w\-_?=&%./#]+/gi;
+  result.maps_links = text.match(mapsRegex) || [];
 
-  text.split("\n").forEach((line) => {
-    const colonIdx = line.indexOf(":");
-    if (colonIdx === -1) return;
-    const key = line.slice(0, colonIdx).trim().toLowerCase();
-    const val = line.slice(colonIdx + 1).trim();
-    const field = fieldMap[key];
-    if (field) (result as unknown as Record<string, string>)[field] = val;
-  });
+  // เบอร์โทร (10 หลัก)
+  const phoneMatch = text.match(/0[6-9]\d{8}/);
+  if (phoneMatch) result.phone = phoneMatch[0];
 
-  ["pickup_date", "customer_name", "pickup_address", "warehouse_name"].forEach((f) => {
-    if (!(result as unknown as Record<string, string>)[f]) result.errors.push(`ขาด ${f}`);
-  });
+  // รหัสคลัง (6 หลัก เช่น 890129)
+  const warehouseMatch = text.match(/\b8\d{5}\b/);
+  if (warehouseMatch) result.warehouse_code = warehouseMatch[0];
 
-  if (result.errors.length > 0) {
-    result.confidence = result.errors.length <= 2 ? "partial" : "failed";
-  }
+  // เวลา (HH.MM น. หรือ HH:MM)
+  const timeMatch = text.match(/\d{1,2}[.:]\d{2}(?:\s*-\s*\d{1,2}[.:]\d{2})?\s*น\.?/);
+  if (timeMatch) result.time = timeMatch[0].trim();
+
+  // จำนวนของ (เช่น 100+ กล่อง, 200+ ชิ้น)
+  const qtyMatch = text.match(/\d+\+?\s*(?:กล่อง|ซอง|ชิ้น|ลัง|ถุง)[^,\n]*/i);
+  if (qtyMatch) result.quantity = qtyMatch[0].trim();
+
+  // ประเภทรถ
+  const vehicleMatch = text.match(/กระบะ\s*\d*\s*คัน|รถ\w+/i);
+  if (vehicleMatch) result.vehicle_type = vehicleMatch[0].trim();
+
+  // ประเภทงาน
+  if (/^LH/i.test(text.trim())) result.job_type = "LH";
+  else if (/^\d+\s*\n/.test(text.trim())) result.job_type = "numbered";
+
+  // confidence
+  const found = [result.maps_links.length > 0, !!result.warehouse_code, !!result.time].filter(Boolean).length;
+  result.confidence = found >= 2 ? "success" : found >= 1 ? "partial" : "failed";
 
   return result;
-}
-
-async function writeToSheets(data: {
-  messageId: string; groupId: string; sender: string;
-  text: string; now: string; parsed: ParsedJob;
-}) {
-  // Write via Google Sheets API (append to line_raw_messages)
-  const sheetUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/line_raw_messages!A:I:append?valueInputOption=USER_ENTERED&key=${GOOGLE_API_KEY}`;
-
-  // Note: For write operations we need OAuth2, not just API key
-  // For now, log to console — full write needs Service Account
-  console.log("LINE message received:", {
-    messageId: data.messageId,
-    confidence: data.parsed.confidence,
-    customer: data.parsed.customer_name,
-  });
 }

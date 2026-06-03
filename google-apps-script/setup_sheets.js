@@ -141,7 +141,7 @@ function formatAllSheets(ss) {
 }
 
 // ==============================
-// WEBHOOK: รับข้อมูลจาก LINE Bot
+// WEBHOOK: รับข้อมูลจาก Vercel (LINE Bot → Vercel → Apps Script → Sheets)
 // ==============================
 function doPost(e) {
   try {
@@ -150,7 +150,33 @@ function doPost(e) {
     const rawSheet = ss.getSheetByName("line_raw_messages");
     const now = new Date().toISOString();
 
-    // รับ events จาก LINE Messaging API
+    // รับจาก Vercel webhook relay
+    if (body.action === "saveLineMessage") {
+      const { messageId, groupId, senderId, text, messageTime, parsed } = body;
+
+      // เช็ค duplicate
+      const existing = rawSheet.getDataRange().getValues();
+      if (existing.some(row => row[0] === messageId)) {
+        return ContentService.createTextOutput(JSON.stringify({ status: "duplicate" }))
+          .setMimeType(ContentService.MimeType.JSON);
+      }
+
+      const parsedStatus = parsed.confidence;
+      const errorReason = parsedStatus === "failed" ? "ไม่ใช่รูปแบบงาน" : "";
+
+      rawSheet.appendRow([
+        messageId, groupId, senderId, text, messageTime,
+        "success", parsedStatus, errorReason, now,
+        parsed.maps_links.join(", "), parsed.phone,
+        parsed.warehouse_code, parsed.time, parsed.quantity,
+        parsed.vehicle_type, parsed.job_type
+      ]);
+
+      return ContentService.createTextOutput(JSON.stringify({ status: "saved" }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
+    // รับ events จาก LINE Messaging API โดยตรง (fallback)
     const events = body.events || [];
     events.forEach(event => {
       if (event.type !== "message" || event.message.type !== "text") return;
