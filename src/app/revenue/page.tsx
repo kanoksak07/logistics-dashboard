@@ -45,11 +45,11 @@ export default function RevenuePage() {
       <TopBar title="รายได้ & กำไร" subtitle="มิถุนายน 2569" />
       <div className="p-3 md:p-6 space-y-3 md:space-y-5">
 
-        {/* KPI row 1 */}
+        {/* KPI row 1 — mobile: 2 col แต่ Profit Margin span เต็ม */}
         <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-4">
           <KpiCard label="รายได้รวม" value={formatBaht(totalRevenue)} change={12.4} changeLabel="vs เดือนก่อน" />
           <KpiCard label="กำไรสุทธิ" value={formatBaht(netProfit)} valueColor="text-green-700" change={11.2} changeLabel="vs เดือนก่อน" />
-          <KpiCard label="Profit Margin" value={formatPercent(profitMargin)} change={1.5} changeLabel="vs เดือนก่อน" />
+          <KpiCard label="Profit Margin" value={formatPercent(profitMargin)} change={1.5} changeLabel="vs เดือนก่อน" className="col-span-2 md:col-span-1" />
         </div>
 
         {/* KPI row 2 */}
