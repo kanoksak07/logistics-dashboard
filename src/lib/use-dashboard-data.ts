@@ -114,8 +114,27 @@ export function useDashboardData(): DashboardData {
         throw new Error(json.error || `HTTP ${res.status}`);
       }
       const json = await res.json();
+      const realTrips = (json.trips || []).map(sheetRowToTrip);
+
+      // ถ้า Sheets ยังไม่มีข้อมูล trips ให้ใช้ mock data แทน
+      if (realTrips.length === 0) {
+        const { trips: mockTrips, drivers: mockDrivers, vehicles: mockVehicles, costRecords: mockCosts } = await import("./mock-data");
+        setData({
+          trips: mockTrips,
+          drivers: (json.drivers || []).length > 0 ? (json.drivers || []).map(sheetRowToDriver) : mockDrivers,
+          vehicles: (json.vehicles || []).length > 0 ? (json.vehicles || []).map(sheetRowToVehicle) : mockVehicles,
+          costs: (json.costs || []).length > 0 ? (json.costs || []).map(sheetRowToCost) : mockCosts,
+          settings: Object.keys(json.settings || {}).length > 0 ? json.settings : {},
+          lastUpdated: new Date(),
+          isLoading: false,
+          isUsingMockData: true,
+          error: null,
+        });
+        return;
+      }
+
       setData({
-        trips: (json.trips || []).map(sheetRowToTrip),
+        trips: realTrips,
         drivers: (json.drivers || []).map(sheetRowToDriver),
         vehicles: (json.vehicles || []).map(sheetRowToVehicle),
         costs: (json.costs || []).map(sheetRowToCost),
