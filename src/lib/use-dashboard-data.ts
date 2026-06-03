@@ -82,12 +82,12 @@ function sheetRowToVehicle(row: Record<string, string>): Vehicle {
 
 function sheetRowToCost(row: Record<string, string>): CostRecord {
   return {
-    cost_id: row.cost_id || "",
     cost_date: row.cost_date || "",
     cost_category: row.cost_category || "",
+    cost_name: row.cost_name || row.remark || "",
     cost_amount: parseFloat(row.cost_amount || "0"),
     vehicle_id: row.vehicle_id || undefined,
-    driver_id: row.driver_id || undefined,
+    who_paid: row.who_paid || undefined,
     remark: row.remark || "",
   };
 }

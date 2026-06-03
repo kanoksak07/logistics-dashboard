@@ -56,13 +56,12 @@ export interface Vehicle {
 }
 
 export interface CostRecord {
-  cost_id: string;
   cost_date: string;
   cost_category: string;
+  cost_name: string;
   cost_amount: number;
   vehicle_id?: string;
-  driver_id?: string;
-  related_trip_id?: string;
+  who_paid?: string;
   remark: string;
 }
 
@@ -180,16 +179,16 @@ export const trips: Trip[] = [
 ];
 
 export const costRecords: CostRecord[] = [
-  { cost_id: "CST-001", cost_date: "2026-06-01", cost_category: "Maintenance", cost_amount: 8000, vehicle_id: "VEH-001", remark: "เปลี่ยนยาง" },
-  { cost_id: "CST-002", cost_date: "2026-06-05", cost_category: "Fuel",        cost_amount: 3200, vehicle_id: "VEH-001", remark: "เติมน้ำมันสัปดาห์แรก" },
-  { cost_id: "CST-003", cost_date: "2026-06-07", cost_category: "Insurance",   cost_amount: 1667, vehicle_id: "VEH-001", remark: "ค่าประกันรายเดือน" },
-  { cost_id: "CST-004", cost_date: "2026-06-10", cost_category: "Parking",     cost_amount: 2000, vehicle_id: "VEH-001", remark: "ค่าจอดรถเดือนมิถุนายน" },
-  { cost_id: "CST-005", cost_date: "2026-06-12", cost_category: "Fuel",        cost_amount: 2800, vehicle_id: "VEH-001", remark: "เติมน้ำมันสัปดาห์สอง" },
-  { cost_id: "CST-006", cost_date: "2026-06-15", cost_category: "Maintenance", cost_amount: 1200, vehicle_id: "VEH-001", remark: "เปลี่ยนน้ำมันเครื่อง" },
-  { cost_id: "CST-007", cost_date: "2026-06-15", cost_category: "Phone/Internet", cost_amount: 500, remark: "ค่าโทรศัพท์" },
-  { cost_id: "CST-008", cost_date: "2026-06-18", cost_category: "Fuel",        cost_amount: 3100, vehicle_id: "VEH-001", remark: "เติมน้ำมันสัปดาห์สาม" },
-  { cost_id: "CST-009", cost_date: "2026-06-20", cost_category: "Other",       cost_amount: 500,  remark: "ค่าอุปกรณ์ผูกสินค้า" },
-  { cost_id: "CST-010", cost_date: "2026-06-01", cost_category: "Vehicle Purchase", cost_amount: 13333, vehicle_id: "VEH-001", remark: "ค่าเสื่อมราคารถ (allocation)" },
+  { cost_date: "2026-06-01", cost_category: "Maintenance",    cost_name: "เปลี่ยนยาง",           cost_amount: 8000,  vehicle_id: "VEH-001", who_paid: "กรีน", remark: "" },
+  { cost_date: "2026-06-05", cost_category: "Fuel",           cost_name: "เติมน้ำมัน",            cost_amount: 3200,  vehicle_id: "VEH-001", who_paid: "กรีน", remark: "" },
+  { cost_date: "2026-06-07", cost_category: "Insurance",      cost_name: "ค่าประกันรถ",           cost_amount: 1667,  vehicle_id: "VEH-001", who_paid: "กรีน", remark: "" },
+  { cost_date: "2026-06-10", cost_category: "Parking",        cost_name: "ค่าจอดรถ",              cost_amount: 2000,  vehicle_id: "VEH-001", who_paid: "กรีน", remark: "" },
+  { cost_date: "2026-06-12", cost_category: "Fuel",           cost_name: "เติมน้ำมัน",            cost_amount: 2800,  vehicle_id: "VEH-001", who_paid: "ข่า",  remark: "" },
+  { cost_date: "2026-06-15", cost_category: "Maintenance",    cost_name: "เปลี่ยนน้ำมันเครื่อง", cost_amount: 1200,  vehicle_id: "VEH-001", who_paid: "ข่า",  remark: "" },
+  { cost_date: "2026-06-15", cost_category: "Phone/Internet", cost_name: "ค่าโทรศัพท์",          cost_amount: 500,                          who_paid: "กรีน", remark: "" },
+  { cost_date: "2026-06-18", cost_category: "Fuel",           cost_name: "เติมน้ำมัน",            cost_amount: 3100,  vehicle_id: "VEH-001", who_paid: "กรีน", remark: "" },
+  { cost_date: "2026-06-20", cost_category: "Other",          cost_name: "ค่าอุปกรณ์ผูกสินค้า",  cost_amount: 500,                          who_paid: "กรีน", remark: "" },
+  { cost_date: "2026-06-01", cost_category: "Vehicle Purchase",cost_name: "ค่าเสื่อมราคารถ",    cost_amount: 13333, vehicle_id: "VEH-001", who_paid: "กรีน", remark: "allocation" },
 ];
 
 export const lineMessages: LineMessage[] = [
